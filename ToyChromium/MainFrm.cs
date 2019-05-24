@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -84,6 +85,13 @@ namespace ToyChromium
             }
             chPl.Controls.Add(browser);
             browser.Load(url);
+
+            string scriptPath = IniHelper.ReadValue("app", "script", configPath, "");
+            if (scriptPath != "")
+            {
+                string jsContent = File.ReadAllText(Environment.CurrentDirectory + "\\Resources\\" + scriptPath);
+                browser.ExecuteScriptAsyncWhenPageLoaded(jsContent);
+            }
         }
 
         private void MainFrm_FormClosing(object sender, FormClosingEventArgs e)

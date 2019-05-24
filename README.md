@@ -3,7 +3,9 @@
 
 本工具使用CefSharp.WinForms稳定版73.1.130插件，实现简单访问功能，去除浏览器中的各种友好提示。实现沉浸式访问
 
-需要最低framework4.5.2版本支持，Visual Studio 2017
+需要最低framework4.5.2版本和Microsoft Visual C++ 2015-2019 Redistribtable (x86)支持
+
+Visual Studio 2017开发
 
 ### 配置文件说明
 
