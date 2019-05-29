@@ -23,6 +23,7 @@ namespace ToyChromium
         Size mainSize;
         string url="baidu.com";
         ChromiumWebBrowser browser;
+        string jsFunction = "";
 
         UdpServer udpServer;
 
@@ -83,15 +84,33 @@ namespace ToyChromium
             {
                 browser.MenuHandler = new CustomMenuHandler();
             }
+
+            browser.FrameLoadEnd += Browser_FrameLoadEnd;
             chPl.Controls.Add(browser);
             browser.Load(url);
 
             string scriptPath = IniHelper.ReadValue("app", "script", configPath, "");
             if (scriptPath != "")
             {
-                string jsContent = File.ReadAllText(Environment.CurrentDirectory + "\\Resources\\" + scriptPath);
-                browser.ExecuteScriptAsyncWhenPageLoaded(jsContent);
+                try
+                {
+                    jsFunction = File.ReadAllText(Environment.CurrentDirectory + "\\Resources\\" + scriptPath);
+                }catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "错误信息");
+                    Environment.Exit(0);
+                }
             }
+        }
+
+        private void Browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
+        {
+            bool isLoading = e.Browser.IsLoading;
+            if (isLoading)
+            {
+                browser.ExecuteScriptAsync(jsFunction);
+            }
+            Console.WriteLine(isLoading);
         }
 
         private void MainFrm_FormClosing(object sender, FormClosingEventArgs e)

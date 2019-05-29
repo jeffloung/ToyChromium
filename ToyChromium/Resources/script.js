@@ -1,5 +1,5 @@
 ﻿function abc() {
-    alert("abc");
+    alert("inject js");
 }
 
 abc();
