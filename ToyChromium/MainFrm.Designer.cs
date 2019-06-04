@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.chPl = new System.Windows.Forms.Panel();
+            this.lblStatus = new System.Windows.Forms.Label();
+            this.chPl.SuspendLayout();
             this.SuspendLayout();
             // 
             // chPl
@@ -37,10 +39,22 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chPl.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.chPl.Controls.Add(this.lblStatus);
             this.chPl.Location = new System.Drawing.Point(0, 0);
             this.chPl.Name = "chPl";
             this.chPl.Size = new System.Drawing.Size(200, 100);
             this.chPl.TabIndex = 0;
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.AutoSize = true;
+            this.lblStatus.BackColor = System.Drawing.Color.Black;
+            this.lblStatus.ForeColor = System.Drawing.Color.White;
+            this.lblStatus.Location = new System.Drawing.Point(12, 9);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(41, 12);
+            this.lblStatus.TabIndex = 0;
+            this.lblStatus.Text = "已启动";
             // 
             // MainFrm
             // 
@@ -49,12 +63,13 @@
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.chPl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.KeyPreview = true;
             this.Name = "MainFrm";
             this.Text = "ToyChromium";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFrm_FormClosing);
             this.Load += new System.EventHandler(this.MainFrm_Load);
+            this.chPl.ResumeLayout(false);
+            this.chPl.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -62,6 +77,7 @@
         #endregion
 
         private System.Windows.Forms.Panel chPl;
+        private System.Windows.Forms.Label lblStatus;
     }
 }
 

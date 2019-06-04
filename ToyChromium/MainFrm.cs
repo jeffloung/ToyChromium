@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
@@ -14,11 +15,15 @@ using STLib;
 
 namespace ToyChromium
 {
+    public delegate void SetStatus(bool visiable, string text);
+
     public partial class MainFrm : Form
     {
+        string path;
         string configFile = "config.ini";
         string fullscreen;
         string mouseright;
+        string topmost;
         Dictionary<string, string> commands;
         Size mainSize;
         string url="baidu.com";
@@ -34,12 +39,10 @@ namespace ToyChromium
 
         private void MainFrm_Load(object sender, EventArgs e)
         {
-            string path = Environment.CurrentDirectory+"\\"+configFile;
+            path = Environment.CurrentDirectory+"\\"+configFile;
             InitConfig(path);
 
             InitSrv();
-
-            
         }
 
         private void InitSrv()
@@ -73,8 +76,13 @@ namespace ToyChromium
                 mainSize.Width = Screen.PrimaryScreen.Bounds.Width;
                 this.Size = mainSize;
             }
-
             chPl.Size = this.Size;
+
+            topmost = IniHelper.ReadValue("app", "topmost", configPath, "0");
+            if (topmost.Equals("1"))
+            {
+                this.TopMost = true;
+            }
 
             browser = new ChromiumWebBrowser(url)
             {
@@ -84,7 +92,8 @@ namespace ToyChromium
             {
                 browser.MenuHandler = new CustomMenuHandler();
             }
-
+            
+            browser.FrameLoadStart += Browser_FrameLoadStart;
             browser.FrameLoadEnd += Browser_FrameLoadEnd;
             chPl.Controls.Add(browser);
             browser.Load(url);
@@ -103,14 +112,35 @@ namespace ToyChromium
             }
         }
 
+        private void Browser_FrameLoadStart(object sender, FrameLoadStartEventArgs e)
+        {
+            BeginInvoke(new SetStatus(setStatus), true, "开始载入");
+        }
+
+        private void setStatus(bool visiable, string text)
+        {
+            lblStatus.Visible = visiable;
+            lblStatus.Text = text;
+        }
+
         private void Browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
         {
+            int httpCode = e.HttpStatusCode;
             bool isLoading = e.Browser.IsLoading;
-            if (isLoading)
+            Console.WriteLine("end:" + httpCode + isLoading);
+            if (httpCode == 200)
             {
+                BeginInvoke(new SetStatus(setStatus), false, "成功");
                 browser.ExecuteScriptAsync(jsFunction);
             }
-            Console.WriteLine(isLoading);
+            else
+            {
+                BeginInvoke(new SetStatus(setStatus), true, "载入失败，状态码：" + e.HttpStatusCode
+                    + "，请检查网络，开始自动刷新");
+                browser.Reload(true);
+                Thread.Sleep(5000);
+                Console.WriteLine("刷新");
+            }
         }
 
         private void MainFrm_FormClosing(object sender, FormClosingEventArgs e)
