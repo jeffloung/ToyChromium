@@ -24,7 +24,7 @@ namespace ToyChromium
         /// <summary>
         /// 当前目录，包含有最后的\
         /// </summary>
-        string currentPath;
+        string currentExePath;
         string path;
         string configFile = "config.ini";
         string fullscreen;
@@ -33,6 +33,7 @@ namespace ToyChromium
         Dictionary<string, string> commands;
         Size mainSize;
         string url="baidu.com";
+        bool localUrl = false;
         ChromiumWebBrowser browser;
         string jsFunction = "";
 
@@ -47,57 +48,8 @@ namespace ToyChromium
 
         private void MainFrm_Load(object sender, EventArgs e)
         {
-            // full path of python interpreter 
-            string python = "python.exe";
-
-            // python app to call 
-            string myPythonApp = Environment.CurrentDirectory + "\\Resources\\getimg.py";
-
-            // dummy parameters to send Python script 
-            int x = 2;
-            int y = 5;
-
-            // Create new process start info 
-            ProcessStartInfo myProcessStartInfo = new ProcessStartInfo(python);
-
-            // make sure we can read the output from stdout 
-            myProcessStartInfo.UseShellExecute = false;
-            myProcessStartInfo.RedirectStandardOutput = true;
-
-            // start python app with 3 arguments  
-            // 1st arguments is pointer to itself,  
-            // 2nd and 3rd are actual arguments we want to send 
-            myProcessStartInfo.Arguments = myPythonApp + " " + x + " " + y;
-
-            Process myProcess = new Process
-            {
-                // assign start information to the process 
-                StartInfo = myProcessStartInfo
-            };
-
-            Console.WriteLine("Calling Python script with arguments {0} and {1}", x, y);
-            // start the process 
-            myProcess.Start();
-
-            // Read the standard output of the app we called.  
-            // in order to avoid deadlock we will read output first 
-            // and then wait for process terminate: 
-            StreamReader myStreamReader = myProcess.StandardOutput;
-            string myString = myStreamReader.ReadLine();
-
-            /*if you need to read multiple lines, you might use: 
-                string myString = myStreamReader.ReadToEnd() */
-
-            // wait exit signal from the app we called and then close it. 
-            myProcess.WaitForExit();
-            myProcess.Close();
-
-            // write the output we got from python app 
-            Console.WriteLine("Value received from script: " + myString);
-            currentPath = Environment.CurrentDirectory + "\\";
-            LocalMode();
-            //return;
-            path = Environment.CurrentDirectory+"\\"+configFile;
+            currentExePath = Environment.CurrentDirectory + "\\";
+            path = currentExePath + configFile;
             InitConfig(path);
 
             InitSrv();
@@ -111,7 +63,7 @@ namespace ToyChromium
             watcher.EnableRaisingEvents = true;
             watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
             watcher.Filter = "*.jpg";
-            watcher.Path = currentPath + "Template\\fillimg\\";
+            watcher.Path = currentExePath + "Template\\fillimg\\";
             watcher.Changed += Watcher_Changed;
             watcher.EndInit();
         }
@@ -146,8 +98,14 @@ namespace ToyChromium
 
         private void InitConfig(string configPath)
         {
-            //url = IniHelper.ReadValue("app", "url", configPath);
-            url = Environment.CurrentDirectory + "\\Template\\fillimg\\index.html";
+            
+            url = IniHelper.ReadValue("app", "url", configPath);
+            localUrl = url.IndexOf("/") > 0 ? false : true;
+            if (localUrl)
+            {
+                url = currentExePath + "Template\\" + url;
+                LocalMode();
+            }
             fullscreen = IniHelper.ReadValue("app", "fullscreen", configPath, "0");
             mouseright = IniHelper.ReadValue("app", "disablemouseright", configPath, "0");
             commands = new Dictionary<string, string>();
@@ -166,6 +124,13 @@ namespace ToyChromium
             {
                 this.TopMost = true;
             }
+
+            //设置缓存
+            CefSettings cefSettings = new CefSettings
+            {
+                CachePath = currentExePath + "Cache"
+            };
+            Cef.Initialize(cefSettings);
 
             browser = new ChromiumWebBrowser(url)
             {
@@ -232,6 +197,13 @@ namespace ToyChromium
             {
                 udpServer.Stop();
             }
+        }
+
+        private void debug_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine("degub");
+            browser.ExecuteScriptAsync("console.log(document.querySelector('home-assistant'))");
+
         }
     }
 }

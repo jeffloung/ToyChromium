@@ -30,6 +30,7 @@
         {
             this.chPl = new System.Windows.Forms.Panel();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.debug = new System.Windows.Forms.Button();
             this.chPl.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,11 +57,22 @@
             this.lblStatus.TabIndex = 0;
             this.lblStatus.Text = "已启动";
             // 
+            // debug
+            // 
+            this.debug.Location = new System.Drawing.Point(691, 12);
+            this.debug.Name = "debug";
+            this.debug.Size = new System.Drawing.Size(97, 89);
+            this.debug.TabIndex = 1;
+            this.debug.Text = "debug";
+            this.debug.UseVisualStyleBackColor = true;
+            this.debug.Click += new System.EventHandler(this.debug_Click);
+            // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.debug);
             this.Controls.Add(this.chPl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.KeyPreview = true;
@@ -78,6 +90,7 @@
 
         private System.Windows.Forms.Panel chPl;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.Button debug;
     }
 }
 

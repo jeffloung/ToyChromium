@@ -5,10 +5,11 @@
 * */
 var isDebug = true;
 
-$(function () {
+/*$(function () {
     if (isDebug) {
         console.log('脚本运行开始');
     }
+    alert("load");
     removeItem();
     changeItem();
     changePos();
@@ -93,3 +94,4 @@ function addReset() {
     let addhtml = '<option value="none">复位</option>';
     $('#shower-select').append(addhtml);
 }
+*/
