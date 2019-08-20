@@ -65,6 +65,7 @@
             this.debug.TabIndex = 1;
             this.debug.Text = "debug";
             this.debug.UseVisualStyleBackColor = true;
+            this.debug.Visible = false;
             this.debug.Click += new System.EventHandler(this.debug_Click);
             // 
             // MainFrm

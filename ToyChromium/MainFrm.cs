@@ -30,6 +30,7 @@ namespace ToyChromium
         string fullscreen;
         string mouseright;
         string topmost;
+        string failautoreflush;
         Dictionary<string, string> commands;
         Size mainSize;
         string url="baidu.com";
@@ -108,6 +109,7 @@ namespace ToyChromium
             }
             fullscreen = IniHelper.ReadValue("app", "fullscreen", configPath, "0");
             mouseright = IniHelper.ReadValue("app", "disablemouseright", configPath, "0");
+            failautoreflush =IniHelper.ReadValue("app", "failautoreflush", configPath, "0");
             commands = new Dictionary<string, string>();
             commands = IniHelper.ReadKeyValues("command", configPath);
             if (fullscreen == "1")
@@ -176,12 +178,13 @@ namespace ToyChromium
             int httpCode = e.HttpStatusCode;
             bool isLoading = e.Browser.IsLoading;
             Console.WriteLine("end:" + httpCode + isLoading);
-            if (httpCode == 200 || url.IndexOf(":\\")>0)
+            if (httpCode == 200 || url.IndexOf(":\\") > 0)
             {
                 BeginInvoke(new SetStatus(setStatus), false, "成功");
                 browser.ExecuteScriptAsync(jsFunction);
             }
-            else
+            else if (httpCode >= 300 && httpCode < 400) { }
+            else if (failautoreflush == "1")
             {
                 BeginInvoke(new SetStatus(setStatus), true, "载入失败，状态码：" + e.HttpStatusCode
                     + "，请检查网络，开始自动刷新");
