@@ -130,6 +130,7 @@ namespace ToyChromium
             //设置缓存
             CefSettings cefSettings = new CefSettings
             {
+                Locale="zh-CN",
                 CachePath = currentExePath + "Cache"
             };
             Cef.Initialize(cefSettings);
