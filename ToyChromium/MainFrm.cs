@@ -164,10 +164,10 @@ namespace ToyChromium
 
         private void Browser_FrameLoadStart(object sender, FrameLoadStartEventArgs e)
         {
-            BeginInvoke(new SetStatus(setStatus), true, "开始载入");
+            BeginInvoke(new SetStatus(SetStatus), true, "开始载入");
         }
 
-        private void setStatus(bool visiable, string text)
+        private void SetStatus(bool visiable, string text)
         {
             lblStatus.Visible = visiable;
             lblStatus.Text = text;
@@ -180,13 +180,14 @@ namespace ToyChromium
             Console.WriteLine("end:" + httpCode + isLoading);
             if (httpCode == 200 || url.IndexOf(":\\") > 0)
             {
-                BeginInvoke(new SetStatus(setStatus), false, "成功");
+                BeginInvoke(new SetStatus(SetStatus), false, "成功");
                 browser.ExecuteScriptAsync(jsFunction);
             }
             else if (httpCode >= 300 && httpCode < 400) { }
+            else if (httpCode < 0) { }
             else if (failautoreflush == "1")
             {
-                BeginInvoke(new SetStatus(setStatus), true, "载入失败，状态码：" + e.HttpStatusCode
+                BeginInvoke(new SetStatus(SetStatus), true, "载入失败，状态码：" + e.HttpStatusCode
                     + "，请检查网络，开始自动刷新");
                 browser.Reload(true);
                 Thread.Sleep(5000);
@@ -202,7 +203,7 @@ namespace ToyChromium
             }
         }
 
-        private void debug_Click(object sender, EventArgs e)
+        private void Debug_Click(object sender, EventArgs e)
         {
             Console.WriteLine("degub");
             browser.ExecuteScriptAsync("console.log(document.querySelector('home-assistant'))");

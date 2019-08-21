@@ -66,7 +66,7 @@
             this.debug.Text = "debug";
             this.debug.UseVisualStyleBackColor = true;
             this.debug.Visible = false;
-            this.debug.Click += new System.EventHandler(this.debug_Click);
+            this.debug.Click += new System.EventHandler(this.Debug_Click);
             // 
             // MainFrm
             // 
