@@ -119,6 +119,25 @@ namespace ToyChromium
                 mainSize.Width = Screen.PrimaryScreen.Bounds.Width;
                 this.Size = mainSize;
             }
+            else
+            {
+                try
+                {
+                    string customPosition = IniHelper.ReadValue("app", "position", configPath, "0,0");
+                    int posX= int.Parse(customPosition.Split(',')[0]);
+                    int posY= int.Parse(customPosition.Split(',')[1]);
+                    this.Location = new Point(posX, posY);
+
+                    string customSize = IniHelper.ReadValue("app", "size", configPath, "800,400");
+                    mainSize.Width = int.Parse(customSize.Split(',')[0]);
+                    mainSize.Height = int.Parse(customSize.Split(',')[1]);
+                    this.Size = mainSize;
+                }
+                catch(Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                }
+            }
             chPl.Size = this.Size;
 
             topmost = IniHelper.ReadValue("app", "topmost", configPath, "0");
