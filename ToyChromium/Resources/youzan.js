@@ -1,11 +1,12 @@
 ﻿(function run() {
     //alert('run');
     removeItem();
-    other();
+    //other();
 })();
 
 function removeItem() {
-    document.querySelector('#shared-sidebar').remove()
+    var list = document.querySelector('.wrap').childNodes
+    document.querySelector('.wrap').innerHTML = list[1].innerHTML
 }
 
 function other() {
