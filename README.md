@@ -15,7 +15,9 @@ Visual Studio 2017开发
 fullscreen=0
 ;是否屏蔽右键
 disablemouseright=1
-;默认打开的url
+;默认打开的url,有2种模式，
+;1.在线，直接写入url，例https://www.baidu.com
+;2.本地，写入本地网页的根目录（绝对路径）,例E:\www，另外默认文档必须是index.html
 url=www.baidu.com
 ;udp服务端监听端口号
 udpport=10010
@@ -26,3 +28,10 @@ script=script.js
 cmd1=functiona()
 cmd2=functionb()
 ```
+### 历史更新
+* 1.1
+增加打开本地html文件功能，与在服务器端访问效果一致
+修改加载本地html时的判断逻辑
+增加F12调试功能
+* 1.0
+编写完成并项目使用

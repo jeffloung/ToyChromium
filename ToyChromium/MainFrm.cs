@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
+using CefSharp.SchemeHandler;
 using CefSharp.WinForms;
 using STLib;
 
@@ -56,19 +57,6 @@ namespace ToyChromium
             InitSrv();
         }
 
-        private void LocalMode()
-        {
-            watcher = new FileSystemWatcher();
-            watcher.BeginInit();
-            watcher.IncludeSubdirectories = false;
-            watcher.EnableRaisingEvents = true;
-            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
-            watcher.Filter = "*.jpg";
-            watcher.Path = currentExePath + "Template\\fillimg\\";
-            watcher.Changed += Watcher_Changed;
-            watcher.EndInit();
-        }
-
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
             Console.WriteLine("jpg changed");
@@ -99,14 +87,6 @@ namespace ToyChromium
 
         private void InitConfig(string configPath)
         {
-            
-            url = IniHelper.ReadValue("app", "url", configPath);
-            localUrl = url.IndexOf("/") > 0 ? false : true;
-            if (localUrl)
-            {
-                url = currentExePath + "Template\\" + url;
-                LocalMode();
-            }
             fullscreen = IniHelper.ReadValue("app", "fullscreen", configPath, "0");
             mouseright = IniHelper.ReadValue("app", "disablemouseright", configPath, "0");
             failautoreflush =IniHelper.ReadValue("app", "failautoreflush", configPath, "0");
@@ -152,17 +132,37 @@ namespace ToyChromium
                 Locale="zh-CN",
                 CachePath = currentExePath + "Cache"
             };
+
+            url = IniHelper.ReadValue("app", "url", configPath);
+            localUrl = url.IndexOf("/") > 0 ? false : true;
+            if (localUrl)
+            {
+                string schemeName = "tc";
+                string domainName = "app";
+                cefSettings.RegisterScheme(new CefCustomScheme
+                {
+                    SchemeName = schemeName,
+                    DomainName = domainName,
+                    SchemeHandlerFactory = new FolderSchemeHandlerFactory(
+                    rootFolder: url,
+                    hostName: domainName,
+                    defaultPage: "index.html" // will default to index.html
+                )
+                });
+                url = schemeName + "://" + domainName;
+            }
+            
             Cef.Initialize(cefSettings);
 
             browser = new ChromiumWebBrowser(url)
             {
-                Dock = DockStyle.Fill
+                Dock = DockStyle.Fill,
+                KeyboardHandler = new CEFKeyBoardHander(),
             };
             if (mouseright == "1")
             {
                 browser.MenuHandler = new CustomMenuHandler();
             }
-
             browser.FrameLoadStart += Browser_FrameLoadStart;
             browser.FrameLoadEnd += Browser_FrameLoadEnd;
             chPl.Controls.Add(browser);
