@@ -23,6 +23,9 @@ namespace ToyChromium
                     case Keys.F5:
                         browser.Reload();
                         break;
+                    case Keys.Back:
+                        browser.GoBack();
+                        break;
                 }
             }
             return false;

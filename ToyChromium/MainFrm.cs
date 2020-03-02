@@ -157,11 +157,11 @@ namespace ToyChromium
             browser = new ChromiumWebBrowser(url)
             {
                 Dock = DockStyle.Fill,
-                KeyboardHandler = new CEFKeyBoardHander(),
+                KeyboardHandler = new CEFKeyBoardHander()
             };
-            if (mouseright == "1")
+            if (mouseright == "1")//如果是1，则禁止响应右键菜单
             {
-                browser.MenuHandler = new CustomMenuHandler();
+                browser.MenuHandler = new CEFMenuHandler();
             }
             browser.FrameLoadStart += Browser_FrameLoadStart;
             browser.FrameLoadEnd += Browser_FrameLoadEnd;
@@ -221,13 +221,6 @@ namespace ToyChromium
             {
                 udpServer.Stop();
             }
-        }
-
-        private void Debug_Click(object sender, EventArgs e)
-        {
-            Console.WriteLine("degub");
-            browser.ExecuteScriptAsync("console.log(document.querySelector('home-assistant'))");
-
         }
     }
 }

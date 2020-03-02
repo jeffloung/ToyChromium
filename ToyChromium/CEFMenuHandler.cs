@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ToyChromium
 {
-    public class CustomMenuHandler : IContextMenuHandler
+    public class CEFMenuHandler : IContextMenuHandler
     {
         public void OnBeforeContextMenu(IWebBrowser browserControl, IBrowser browser, IFrame frame, IContextMenuParams parameters, IMenuModel model)
         {
