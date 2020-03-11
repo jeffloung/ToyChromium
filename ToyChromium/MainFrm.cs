@@ -14,6 +14,8 @@ using CefSharp;
 using CefSharp.SchemeHandler;
 using CefSharp.WinForms;
 using STLib;
+using ToyChromium.Helper;
+using ToyChromium.Helpers;
 
 namespace ToyChromium
 {
@@ -32,9 +34,12 @@ namespace ToyChromium
         string mouseright;
         string topmost;
         string failautoreflush;
+        string listenPath;
+        FileHelper fileHelper;
         Dictionary<string, string> commands;
         Size mainSize;
         string url="baidu.com";
+        string localPath;
         bool localUrl = false;
         ChromiumWebBrowser browser;
         string jsFunction = "";
@@ -55,12 +60,6 @@ namespace ToyChromium
             InitConfig(path);
 
             InitSrv();
-        }
-
-        private void Watcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            Console.WriteLine("jpg changed");
-            BeginInvoke(new ReloadHandle(Reload));
         }
 
         private void Reload()
@@ -134,6 +133,7 @@ namespace ToyChromium
             };
 
             url = IniHelper.ReadValue("app", "url", configPath);
+            localPath = url;
             localUrl = url.IndexOf("/") > 0 ? false : true;
             if (localUrl)
             {
@@ -151,7 +151,20 @@ namespace ToyChromium
                 });
                 url = schemeName + "://" + domainName;
             }
-            
+            listenPath = IniHelper.ReadValue("app", "listenPath", configPath, "");
+            if (listenPath != "")
+            {
+                fileHelper = new FileHelper();
+                watcher = new FileSystemWatcher();
+                watcher.Path = listenPath;
+                watcher.Deleted += Watcher_Deleted;
+                watcher.Created += Watcher_Created;
+                watcher.EnableRaisingEvents = true;
+                Cmd cmd = new Cmd();
+                string p = currentExePath + "nginx";
+                cmd.RunCmd("start.bat",p);
+            }
+
             Cef.Initialize(cefSettings);
 
             browser = new ChromiumWebBrowser(url)
@@ -181,6 +194,36 @@ namespace ToyChromium
                 }
             }
         }
+        #region 文件监听
+        private void Watcher_Deleted(object sender, FileSystemEventArgs e)
+        {
+            UpdateJsonReload();
+        }
+
+        private void Watcher_Created(object sender, FileSystemEventArgs e)
+        {
+            UpdateJsonReload();
+        }
+        private void UpdateJsonReload()
+        {
+            string json = fileHelper.GetJsonFileName(listenPath);
+            browser.ExecuteScriptAsync("setLSReload('" + json + "')");
+        }
+        async void SetCookies()
+        {
+            var cookieManager = Cef.GetGlobalCookieManager();
+            string json = fileHelper.GetJsonFileName(listenPath);
+            Cookie cookie = new Cookie()
+            {
+                Domain = url,
+                Name = "images",
+                Value = json,
+                Expires = DateTime.MinValue
+            };
+            await cookieManager.SetCookieAsync(url, cookie);
+        }
+        #endregion
+
 
         private void Browser_FrameLoadStart(object sender, FrameLoadStartEventArgs e)
         {
@@ -217,6 +260,13 @@ namespace ToyChromium
 
         private void MainFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (listenPath != "")
+            {
+                Cmd cmd = new Cmd();
+                string p = currentExePath + "nginx";
+                cmd.RunCmd("nginx -s quit", p);
+            }
+           
             if (udpServer != null)
             {
                 udpServer.Stop();
