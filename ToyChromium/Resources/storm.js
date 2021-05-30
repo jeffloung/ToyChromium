@@ -28,11 +28,13 @@ let lastClickId = 0;
 function detail() {
 	setTimeout(() => {
 		addStyle();
+		hideContent();
 		
 		$('#toolcon').css('display', 'none');
 		$('.container.bordernone').css('display', 'none');
 		$('.oppi').click();
 		addInfo();
+		addReload();
 
 		$(document).ajaxSuccess((event, xhr, settings) => {
 			console.log('document ajaxSuccess')
@@ -105,6 +107,14 @@ function addInfo() {
 	$("body").append(html);
 }
 
+function addReload() {
+	let button = '<div class="reloadBtn" onclick="reload()">复位</div>';
+	$("body").append(button);
+}
+function reload() {
+	location.reload();
+}
+
 function addStyle() {
 	var style = document.createElement("style");
 	style.type = "text/css";
@@ -112,11 +122,18 @@ function addStyle() {
 		style.appendChild(document.createTextNode(".tYear{padding:5px 4px; color: #82848d; width: 50px;}"));
 		style.appendChild(document.createTextNode(".tYearFrame{height:300px; overflow: hidden;}"));
 		style.appendChild(document.createTextNode(".yearLight{color:white;text-shadow: 2px 0px 5px white,-2px 0px 5px white,0px 2px 5px white,0px -2px 5px white;}"));
+		style.appendChild(document.createTextNode(".reloadBtn{position: absolute;z-index: 9;background-color: rgb(128 128 128 / 0.5);font-size: 18px;padding: 2px;}"));
 	} catch (ex) {
 		style.styleSheet.cssText = "body{background-color:red}";//针对IE
 	}
 	var head = document.getElementsByTagName("head")[0];
 	head.appendChild(style);
+}
+
+function hideContent() {
+	let a = document.querySelector('#dmcon').childNodes;
+	a[1].hidden = true;
+	a[3].hidden = true
 }
 
 
