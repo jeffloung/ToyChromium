@@ -19,7 +19,8 @@ using ToyChromium.Helpers;
 
 namespace ToyChromium
 {
-    public delegate void SetStatus(bool visiable, string text);
+    public delegate void SetStatusDelegate(bool visiable, string text);
+    public delegate void SetPictureDelegate(bool visiable, string text);
     public delegate void ReloadHandle();
 
     public partial class MainFrm : Form
@@ -82,6 +83,8 @@ namespace ToyChromium
 
         private void InitConfig(string configPath)
         {
+            picBox.SendToBack();
+            SetPicture(true);
             fullscreen = IniHelper.ReadValue("app", "fullscreen", configPath, "0");
             mouseright = IniHelper.ReadValue("app", "disablemouseright", configPath, "0");
             failautoreflush =IniHelper.ReadValue("app", "failautoreflush", configPath, "0");
@@ -93,6 +96,7 @@ namespace ToyChromium
                 mainSize.Height = Screen.PrimaryScreen.Bounds.Height;
                 mainSize.Width = Screen.PrimaryScreen.Bounds.Width;
                 this.Size = mainSize;
+                picBox.Size = mainSize;
             }
             else
             {
@@ -107,8 +111,9 @@ namespace ToyChromium
                     mainSize.Width = int.Parse(customSize.Split(',')[0]);
                     mainSize.Height = int.Parse(customSize.Split(',')[1]);
                     this.Size = mainSize;
+                    picBox.Size = mainSize;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     MessageBox.Show(e.Message);
                 }
@@ -125,7 +130,8 @@ namespace ToyChromium
             CefSettings cefSettings = new CefSettings
             {
                 Locale="zh-CN",
-                CachePath = currentExePath + "Cache"
+                CachePath = currentExePath + "Cache",
+                LogSeverity = LogSeverity.Disable
             };
 
             url = IniHelper.ReadValue("app", "url", configPath);
@@ -180,13 +186,20 @@ namespace ToyChromium
 
         private void Browser_FrameLoadStart(object sender, FrameLoadStartEventArgs e)
         {
-            BeginInvoke(new SetStatus(SetStatus), true, "开始载入");
+            BeginInvoke(new SetStatusDelegate(SetStatus), true, "开始载入");
         }
 
         private void SetStatus(bool visiable, string text)
         {
             lblStatus.Visible = visiable;
             lblStatus.Text = text;
+            picBox.Visible = visiable;
+        }
+
+        void SetPicture(bool visiable, string path = "Resources/start.jpg")
+        {
+            picBox.Image = new Bitmap(path);
+            picBox.Visible = visiable;
         }
 
         private void Browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
@@ -196,15 +209,17 @@ namespace ToyChromium
             Console.WriteLine("end:" + httpCode + isLoading);
             if (httpCode == 200 || url.IndexOf(":\\") > 0)
             {
-                BeginInvoke(new SetStatus(SetStatus), false, "成功");
+                BeginInvoke(new SetStatusDelegate(SetStatus), false, "成功");
+                BeginInvoke(new SetPictureDelegate(SetPicture), false, "Resources/error.jpg");
                 browser.ExecuteScriptAsync(jsFunction);
             }
             else if (httpCode >= 300 && httpCode < 400) { }
             else if (httpCode < 0) { }
             else if (failautoreflush == "1")
             {
-                BeginInvoke(new SetStatus(SetStatus), true, "载入失败，状态码：" + e.HttpStatusCode
-                    + "，请检查网络，开始自动刷新");
+                BeginInvoke(new SetStatusDelegate(SetStatus), true, "加载外部网页失败，5秒后尝试重新连接...(状态码:" + e.HttpStatusCode
+                    + "，网络错误)");
+                BeginInvoke(new SetPictureDelegate(SetPicture), true, "Resources/error.jpg");
                 browser.Reload(true);
                 Thread.Sleep(5000);
                 Console.WriteLine("刷新");

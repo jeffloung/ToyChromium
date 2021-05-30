@@ -31,7 +31,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainFrm));
             this.chPl = new System.Windows.Forms.Panel();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.picBox = new System.Windows.Forms.PictureBox();
             this.chPl.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picBox)).BeginInit();
             this.SuspendLayout();
             // 
             // chPl
@@ -40,6 +42,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chPl.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.chPl.Controls.Add(this.picBox);
             this.chPl.Controls.Add(this.lblStatus);
             this.chPl.Location = new System.Drawing.Point(0, 0);
             this.chPl.Name = "chPl";
@@ -50,12 +53,22 @@
             // 
             this.lblStatus.AutoSize = true;
             this.lblStatus.BackColor = System.Drawing.Color.Black;
+            this.lblStatus.Font = new System.Drawing.Font("宋体", 30F);
             this.lblStatus.ForeColor = System.Drawing.Color.White;
             this.lblStatus.Location = new System.Drawing.Point(12, 9);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(41, 12);
+            this.lblStatus.Size = new System.Drawing.Size(137, 40);
             this.lblStatus.TabIndex = 0;
             this.lblStatus.Text = "已启动";
+            // 
+            // picBox
+            // 
+            this.picBox.Location = new System.Drawing.Point(0, 0);
+            this.picBox.Name = "picBox";
+            this.picBox.Size = new System.Drawing.Size(244, 159);
+            this.picBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picBox.TabIndex = 1;
+            this.picBox.TabStop = false;
             // 
             // MainFrm
             // 
@@ -72,6 +85,7 @@
             this.Load += new System.EventHandler(this.MainFrm_Load);
             this.chPl.ResumeLayout(false);
             this.chPl.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picBox)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -80,6 +94,7 @@
 
         private System.Windows.Forms.Panel chPl;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.PictureBox picBox;
     }
 }
 
